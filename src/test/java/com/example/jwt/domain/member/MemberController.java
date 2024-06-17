@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.nio.charset.StandardCharsets;
 
@@ -57,6 +58,7 @@ class MemberControllerTest {
     }
 
     @Test
+    @WithUserDetails("user1")
     @DisplayName("GET /member/me => 내 정보를 확인하는 URL 이다.")
     void t2() throws Exception {
 
@@ -73,6 +75,7 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("S-2"))
                 .andExpect(jsonPath("$.msg").exists())
                 .andExpect(jsonPath("$.data.member.id").exists())
-                .andExpect(jsonPath("$.data.member.username").exists());
+                .andExpect(jsonPath("$.data.member.username").exists())
+                .andExpect(jsonPath("$.data.member.username").value("user1"));
     }
 }
