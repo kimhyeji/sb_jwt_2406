@@ -1,9 +1,9 @@
 package com.example.jwt.domain.article;
 
+import com.example.jwt.domain.article.controller.ArticleController;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,14 +13,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.web.servlet.function.RequestPredicates.path;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -94,7 +92,7 @@ public class ArticleControllerTest {
     }
 
     @Test
-    @DisplayName("POST /articles/2")
+    @DisplayName("PATCH /articles/2")
     @WithUserDetails("admin")
     void t4() throws Exception {
         // When
@@ -119,6 +117,25 @@ public class ArticleControllerTest {
                 .andExpect(jsonPath("$.data.article.id").value(2))
                 .andExpect(jsonPath("$.data.article.subject").value("제목 2222 !!!"))
                 .andExpect(jsonPath("$.data.article.content").value("내용 2222 !!!"));
+
+    }
+
+    @Test
+    @DisplayName("DELETE /articles/2")
+    @WithUserDetails("admin")
+    void t5() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(delete("/api/v1/articles/2"))
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(ArticleController.class))
+                .andExpect(handler().methodName("remove"))
+                .andExpect(jsonPath("$.resultCode").value("S-5"))
+                .andExpect(jsonPath("$.msg").exists());
 
     }
 }
